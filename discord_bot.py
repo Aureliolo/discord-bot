@@ -53,8 +53,8 @@ async def update_channel():
                             await channel.edit(name=f"Time left: {int(days)}d {int(hours)}h {int(minutes)}m")
                         else:
                             await channel.edit(name=f"Time left: {int(hours)}h {int(minutes)}m")
-                    except Forbidden:
-                        print(f"The bot does not have permission to edit the channel {channel.name}.")
+                    except Exception as e:
+                        print(f"An error occurred while trying to edit the channel {channel.name}. Error details: {str(e)}")
                 else:
                     print(f"The bot does not have 'manage_channels' permission in channel {channel.name}.")
 
