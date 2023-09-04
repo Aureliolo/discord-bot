@@ -18,23 +18,28 @@ async def update_channel():
 
         for data in channel_data:
             try:
-                channel_id, target_hour, target_minute, repeat_days = map(int, data.split(':'))
+                parts = data.split(':')
+                channel_id = int(parts[0])
+                weekday = int(parts[1])
+                target_hour = int(parts[2])
+                target_minute = int(parts[3])
+                repeat_interval = parts[4]
             except ValueError:
                 print(f"Skipping invalid data: {data}")
                 continue
 
-            # Convert target_hour into days and remaining hours
-            extra_days, remaining_hours = divmod(target_hour, 24)
+            target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
 
-            target_time = now.replace(hour=remaining_hours, minute=target_minute, second=0, microsecond=0)
+            # Adjust for the correct weekday
+            days_until_target = (weekday - now.weekday() + 7) % 7
+            target_time += timedelta(days=days_until_target)
 
-            # If additional days are defined, add them to target_time
-            if extra_days:
-                target_time += timedelta(days=extra_days)
-            
             # Make sure target_time is in the future
             while target_time <= now:
-                target_time += timedelta(days=repeat_days)
+                if repeat_interval == "daily":
+                    target_time += timedelta(days=1)
+                elif repeat_interval == "weekly":
+                    target_time += timedelta(days=7)
 
             time_left = target_time - now
             days, time_left_seconds = divmod(time_left.total_seconds(), 86400)  # 86400 seconds in a day
@@ -42,11 +47,8 @@ async def update_channel():
             minutes, seconds = divmod(remainder, 60)
 
             channel = client.get_channel(channel_id)
-            
             if channel:
                 permissions = channel.permissions_for(channel.guild.me)
-                print(f"Permissions for bot in channel {channel.name}: {permissions}")
-                
                 if permissions.manage_channels:
                     try:
                         if days:
@@ -59,7 +61,6 @@ async def update_channel():
                     print(f"The bot does not have 'manage_channels' permission in channel {channel.name}.")
 
         sys.stdout.flush()  # Flush the stdout buffer explicitly
-                
         await asyncio.sleep(30)  # Sleep for 30 seconds
 
 @client.event
