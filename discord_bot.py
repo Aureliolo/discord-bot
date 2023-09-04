@@ -38,7 +38,7 @@ async def update_channel():
             if channel:
                 await channel.edit(name=f"Time left: {hours}h {minutes}m {seconds}s")
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(30)  # Sleep for 30 seconds
 
 @client.event
 async def on_ready():
