@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 import asyncio
 import os
 from discord.errors import Forbidden
+import sys
 
 intents = discord.Intents.default()
 client = discord.Client(intents=intents)
@@ -56,6 +57,8 @@ async def update_channel():
                         print(f"The bot does not have permission to edit the channel {channel.name}.")
                 else:
                     print(f"The bot does not have 'manage_channels' permission in channel {channel.name}.")
+
+        sys.stdout.flush()  # Flush the stdout buffer explicitly
                 
         await asyncio.sleep(30)  # Sleep for 30 seconds
 
