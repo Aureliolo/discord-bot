@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 import asyncio
 import os
 
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
+
 TOKEN = os.environ.get('TOKEN', '')  # Read from environment variable
 CHANNELS_TIMESTAMPS = os.environ.get('CHANNELS_TIMESTAMPS', '')  # Read from environment variable
-
-client = discord.Client()
 
 async def update_channel():
     while True:
@@ -22,7 +23,6 @@ async def update_channel():
 
             target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
             
-            # Calculate the number of days from the target time to now, and add the appropriate number of days to the target time
             delta_days = (now - target_time).days
             if delta_days >= 0:
                 cycles_passed = delta_days // repeat_days
