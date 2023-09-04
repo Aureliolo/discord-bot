@@ -61,7 +61,7 @@ async def update_channel():
                     print(f"The bot does not have 'manage_channels' permission in channel {channel.name}.")
 
         sys.stdout.flush()  # Flush the stdout buffer explicitly
-        await asyncio.sleep(30)  # Sleep for 30 seconds
+        await asyncio.sleep(60)  # Sleep for 30 seconds
 
 @client.event
 async def on_ready():
