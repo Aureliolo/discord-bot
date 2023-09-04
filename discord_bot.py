@@ -24,15 +24,13 @@ async def update_channel():
 
             target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
             
-            delta_days = (now - target_time).days
-            if delta_days >= 0:
-                cycles_passed = delta_days // repeat_days
-                next_cycle = cycles_passed + 1
-                days_to_add = next_cycle * repeat_days
-                target_time += timedelta(days=days_to_add)
+            # Make sure target_time is in the future
+            while target_time <= now:
+                target_time += timedelta(days=repeat_days)
 
             time_left = target_time - now
-            hours, remainder = divmod(time_left.seconds, 3600)
+            days, time_left_seconds = divmod(time_left.total_seconds(), 86400)  # 86400 seconds in a day
+            hours, remainder = divmod(time_left_seconds, 3600)
             minutes, seconds = divmod(remainder, 60)
 
             channel = client.get_channel(channel_id)
@@ -43,7 +41,10 @@ async def update_channel():
                 
                 if permissions.manage_channels:
                     try:
-                        await channel.edit(name=f"Time left: {hours}h {minutes}m {seconds}s")
+                        if days:
+                            await channel.edit(name=f"Time left: {int(days)}d {int(hours)}h {int(minutes)}m")
+                        else:
+                            await channel.edit(name=f"Time left: {int(hours)}h {int(minutes)}m")
                     except Forbidden:
                         print(f"The bot does not have permission to edit the channel {channel.name}.")
                 else:
