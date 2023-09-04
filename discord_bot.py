@@ -22,7 +22,14 @@ async def update_channel():
                 print(f"Skipping invalid data: {data}")
                 continue
 
-            target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+            # Convert target_hour into days and remaining hours
+            extra_days, remaining_hours = divmod(target_hour, 24)
+
+            target_time = now.replace(hour=remaining_hours, minute=target_minute, second=0, microsecond=0)
+
+            # If additional days are defined, add them to target_time
+            if extra_days:
+                target_time += timedelta(days=extra_days)
             
             # Make sure target_time is in the future
             while target_time <= now:
