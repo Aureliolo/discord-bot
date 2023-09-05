@@ -63,6 +63,7 @@ async def update_channel():
         sys.stdout.flush()  # Flush the stdout buffer explicitly
         await asyncio.sleep(305)  # Sleep for 305 seconds, rate limited to every 305
 
+
 @client.event
 async def on_ready():
     print(f'We have logged in as {client.user}')
