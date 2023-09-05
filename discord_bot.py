@@ -15,24 +15,32 @@ async def update_channel():
     while True:
         now = datetime.utcnow()
         channel_data = CHANNELS_TIMESTAMPS.split(',')
-
         for data in channel_data:
             try:
                 parts = data.split(':')
                 channel_id = int(parts[0])
-                weekday = int(parts[1])
-                target_hour = int(parts[2])
-                target_minute = int(parts[3])
-                repeat_interval = parts[4]
-            except ValueError:
-                print(f"Skipping invalid data: {data}")
+                repeat_interval = parts[-1]  # Last item is the interval
+
+                if repeat_interval == "daily":
+                    target_hour = int(parts[1])
+                    target_minute = int(parts[2])
+                elif repeat_interval == "weekly":
+                    weekday = int(parts[1])
+                    target_hour = int(parts[2])
+                    target_minute = int(parts[3])
+                else:
+                    raise ValueError("Invalid interval")
+            except ValueError as e:
+                print(f"Skipping invalid data: {data}. Error: {str(e)}")
                 continue
 
             target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
+            print(f"Initial target time: {target_time}")
 
-            # Adjust for the correct weekday
-            days_until_target = (weekday - now.weekday() + 7) % 7
-            target_time += timedelta(days=days_until_target)
+            # Adjust for the correct weekday ONLY if repeat_interval is "weekly"
+            if repeat_interval == "weekly":
+                days_until_target = (weekday - now.weekday() + 7) % 7
+                target_time += timedelta(days=days_until_target)
 
             # Make sure target_time is in the future
             while target_time <= now:
@@ -62,7 +70,6 @@ async def update_channel():
 
         sys.stdout.flush()  # Flush the stdout buffer explicitly
         await asyncio.sleep(305)  # Sleep for 305 seconds, rate limited to every 305
-
 
 @client.event
 async def on_ready():
