@@ -35,7 +35,6 @@ async def update_channel():
                 continue
 
             target_time = now.replace(hour=target_hour, minute=target_minute, second=0, microsecond=0)
-            print(f"Initial target time: {target_time}")
 
             # Adjust for the correct weekday ONLY if repeat_interval is "weekly"
             if repeat_interval == "weekly":
